@@ -112,8 +112,6 @@ module Mock
 
   class Dropbox
 
-    BASE_PATH="/Mock Webgallery"
-
     attr_reader :session, :client
 
     def initialize
@@ -156,19 +154,19 @@ module Mock
     end
 
     def thumbnail(from_path, size="large")
-      @client.thumbnail(BASE_PATH+from_path, size)
+      @client.thumbnail(ENV['DROPBOX_BASE_PATH']+from_path, size)
     end
 
     def media(path)
-      media = @client.media(BASE_PATH+path)
+      media = @client.media(ENV['DROPBOX_BASE_PATH']+path)
       return media
     end
 
     def metadata(path, file_limit=25000, list=true, hash=nil, rev=nil, include_deleted=false)
-      metadata = @client.metadata(BASE_PATH+path, file_limit, list, hash, rev, include_deleted)
+      metadata = @client.metadata(ENV['DROPBOX_BASE_PATH']+path, file_limit, list, hash, rev, include_deleted)
       contents = Array.new
       metadata['contents'].each do |file|
-        file['path'] = file['path'][(BASE_PATH.length)..(file['path'].length-1)] if file['path'].start_with? BASE_PATH
+        file['path'] = file['path'][(ENV['DROPBOX_BASE_PATH'].length)..(file['path'].length-1)] if file['path'].start_with? ENV['DROPBOX_BASE_PATH']
         contents << file
       end
       metadata['contents'] = contents
