@@ -45,7 +45,6 @@ module Mock
       @dropbox = Dropbox.new
       begin
         thumb_raw = @dropbox.thumbnail(path, "l")
-        logger.info "After error"
         thumb_base64 = "data:image/jpeg;base64,"+Base64.encode64(thumb_raw)
         cloud_image = Cloudinary::Uploader.upload(thumb_base64)
         if cloud_image
