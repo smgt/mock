@@ -1,6 +1,6 @@
 require "bundler/setup"
 require "sinatra/base"
-require "sinatra/reloader"
+require "sinatra/reloader" if development?
 require "dropbox_sdk"
 require "cgi"
 require "base64"
@@ -14,6 +14,12 @@ module Mock
     configure do
       uri = URI.parse(ENV["REDISTOGO_URL"]||="redis://localhost:6379")
       REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
+      #enable :session
+      enable :logging
+    end
+
+    configure :development do
+      register Sinatra::Reloader
     end
 
     helpers do
@@ -31,11 +37,6 @@ module Mock
         end
       end
     end
-
-    register Sinatra::Reloader
-    enable :session
-    enable :logging
-
 
     get "/thumb/*" do
       path = params[:splat].first.gsub("+", " ")
