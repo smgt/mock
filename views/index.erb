@@ -7,7 +7,7 @@
         <% dirs << "<a href=\"/?path=#{CGI.escape(file["path"])}\">#{file["path"]}</a>" %>
       <% else %>
       <% if file["thumb_exists"] %>
-        <a href="/orig/<%= CGI.escape(file['path'])%>">
+        <a href="/image/<%= CGI.escape(file['path'])%>">
           <img src="<%= thumbnail_src(file['path']) %>" width="64" height="64" alt="thumb">
         </a>
       <%end%>
