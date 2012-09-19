@@ -36,15 +36,6 @@ module Mock
     enable :session
     enable :logging
 
-    get "/" do
-      path = params["path"] || "/"
-      @dropbox = Dropbox.new
-      if !@dropbox.session
-        redirect to "/auth"
-      end
-      @files = @dropbox.metadata(path)
-      erb :index
-    end
 
     get "/thumb/*" do
       path = params[:splat].first.gsub("+", " ")
@@ -68,11 +59,12 @@ module Mock
       end
     end
 
-    get "/orig/*" do
+    get "/image/*" do
       path = params[:splat].first.gsub("+", " ")
       if path
         @dropbox = Dropbox.new
         @media = @dropbox.media(path)
+        @path = path
         erb :file
       else
         halt 404
@@ -100,6 +92,17 @@ module Mock
       f << db.serialize
       f.close
       redirect to "/"
+    end
+
+    # Since we are doing a splat on / this needs to be at the end
+    get "/*" do
+      path = params["path"] || "/"
+      @dropbox = Dropbox.new
+      if !@dropbox.session
+        redirect to "/auth"
+      end
+      @files = @dropbox.metadata(path)
+      erb :index
     end
 
   end
