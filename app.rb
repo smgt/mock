@@ -71,28 +71,30 @@ module Mock
       end
     end
 
-    get "/auth" do
-      db = DropboxSession.new(DROPBOX_CONSUMER_KEY, DROPBOX_CONSUMER_SECRET)
-      db.get_request_token
-      authorize_url = db.get_authorize_url("http://localhost:9292/callback")
-      session[:dropbox] = db.serialize
-      file = File.open("dropbox.yml", "w")
-      file << db.serialize
-      file.close
-      redirect to authorize_url
-    end
+    # Move /auth and /callback into a rake task
+    #
+    # get "/auth" do
+    #   db = DropboxSession.new(DROPBOX_CONSUMER_KEY, DROPBOX_CONSUMER_SECRET)
+    #   db.get_request_token
+    #   authorize_url = db.get_authorize_url("http://localhost:9292/callback")
+    #   session[:dropbox] = db.serialize
+    #   file = File.open("dropbox.yml", "w")
+    #   file << db.serialize
+    #   file.close
+    #   redirect to authorize_url
+    # end
 
-    get "/callback" do
-      f = File.open("dropbox.yml", "r+")
-      dropbox_session = f.readlines.join
-      logger.info dropbox_session.inspect
-      db = DropboxSession.deserialize(dropbox_session)
-      @access_token = db.get_access_token
-      f.rewind
-      f << db.serialize
-      f.close
-      redirect to "/"
-    end
+    # get "/callback" do
+    #   f = File.open("dropbox.yml", "r+")
+    #   dropbox_session = f.readlines.join
+    #   logger.info dropbox_session.inspect
+    #   db = DropboxSession.deserialize(dropbox_session)
+    #   @access_token = db.get_access_token
+    #   f.rewind
+    #   f << db.serialize
+    #   f.close
+    #   redirect to "/"
+    # end
 
     # Since we are doing a splat on / this needs to be at the end
     get "/*" do
