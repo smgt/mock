@@ -1,0 +1,23 @@
+<% if !@dropbox.authorized? %>
+  <a href="/auth" class="btn">Authenticate</a>
+<% else %>
+  <% dirs = Array.new %>
+  <% @files["contents"].each do |file| %>
+      <% if file["is_dir"] %>
+        <% dirs << "<a href=\"/?path=#{CGI.escape(file["path"])}\">#{file["path"]}</a>" %>
+      <% else %>
+      <% if file["thumb_exists"] %>
+        <a href="/orig/<%= CGI.escape(file['path'])%>">
+          <img src="<%= thumbnail_src(file['path']) %>" width="64" height="64" alt="thumb">
+        </a>
+      <%end%>
+      <% end %>
+  <% end %>
+<% end %>
+<div>
+  <ul>
+<% dirs.each do |dir| %>
+    <li><%= dir %></li>
+<% end %>
+  </ul>
+</div>
