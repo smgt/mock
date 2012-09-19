@@ -31,7 +31,17 @@ module Mock
         image_id = REDIS.get "thumb:"+dropbox_path
         if image_id
           url = REDIS.get "cloudinary:"+image_id+":url"
-          return Cloudinary::Utils.cloudinary_url(url.split("/").last, :width => 64, :height => 64, :crop => :thumb )
+          return Cloudinary::Utils.cloudinary_url(url.split("/").last, :width => 128, :height => 128, :crop => :thumb )
+        else
+          return "/thumb/"+CGI.escape(dropbox_path)
+        end
+      end
+
+      def image_src(dropbox_path)
+        image_id = REDIS.get "thumb:"+dropbox_path
+        if image_id
+          url = REDIS.get "cloudinary:"+image_id+":url"
+          return Cloudinary::Utils.cloudinary_url(url.split("/").last, :width => 700, :height => 700, :crop => :fit, :quality => 90)
         else
           return "/thumb/"+CGI.escape(dropbox_path)
         end
@@ -42,17 +52,17 @@ module Mock
       path = params[:splat].first.gsub("+", " ")
       thumb_key = "thumb:"+path
 
-      @dropbox = Dropbox.new
       begin
-        thumb_raw = @dropbox.thumbnail(path, "l")
+        @dropbox = Dropbox.new
+        thumb_raw = @dropbox.thumbnail(path, "xl")
         thumb_base64 = "data:image/jpeg;base64,"+Base64.encode64(thumb_raw)
-        cloud_image = Cloudinary::Uploader.upload(thumb_base64)
+        cloud_image = Cloudinary::Uploader.upload(thumb_base64, :tags => [ENV["RACK_ENV"]])
         if cloud_image
           REDIS.set "thumb:"+path, cloud_image["public_id"]
           REDIS.set "cloudinary:"+cloud_image["public_id"]+":url", cloud_image["url"]
         end
         content_type "image/jpeg"
-        return @dropbox.thumbnail(path, "s")
+        return @dropbox.thumbnail(path, "m")
       rescue DropboxError => e
         logger.info e
         redirect to("/img/placeholder64.png"), 302
@@ -65,7 +75,7 @@ module Mock
         @dropbox = Dropbox.new
         @media = @dropbox.media(path)
         @path = path
-        erb :file
+        erb :image
       else
         halt 404
       end

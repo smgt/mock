@@ -8,7 +8,7 @@
       <% else %>
       <% if file["thumb_exists"] %>
         <a href="/image/<%= CGI.escape(file['path'])%>">
-          <img src="<%= thumbnail_src(file['path']) %>" width="64" height="64" alt="thumb">
+          <img src="<%= thumbnail_src(file['path']) %>" width="128" height="128" alt="thumb">
         </a>
       <%end%>
       <% end %>
